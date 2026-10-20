@@ -1,0 +1,28 @@
+;; The development entry point: the four modules, on replique-clj.
+;;
+;; Each module has its own deps.edn, and the dependencies go one way only:
+;; harness -> compiler -> runtime, and tooling -> compiler. The runtime never
+;; depends on the compiler (doc/compilation.md §3.4).
+;;
+;; replique-clj stands in for org.clojure/clojure, so it is named here, where
+;; the override has to happen. The path assumes ~/clojure/replique-clj beside
+;; ~/replique-lang, the layout the docs link to.
+{:paths []
+ :deps {org.clojure/clojure {:local/root "../../clojure/replique-clj/target/clojure-1.12.5-r1.jar"}
+        org.clojure/spec.alpha {:mvn/version "0.5.238"}
+        org.clojure/core.specs.alpha {:mvn/version "0.4.74"}
+        replique-lang/harness {:local/root "harness"}
+        replique-lang/tooling {:local/root "tooling"}}
+ :aliases
+ {;; clojure -M:test
+  :test {:extra-paths ["runtime/test" "harness/test" "compiler/test" "tooling/test"]
+         :main-opts ["-m" "replique.harness.test-main"]}
+  ;; clojure -M:bench, the reader's speed against Clojure's reader
+  :bench {:extra-paths ["compiler/bench"]
+          :main-opts ["-m" "replique.reader-bench"]}
+  ;; clojure -M:server ['{:process-id "my-app"}'], the REPL server replique.el talks to
+  :server {:main-opts ["-m" "replique.tooling.server"]}
+  ;; clojure -M:conformance [options] [paths]
+  :conformance {:main-opts ["-m" "replique.harness.main"]}
+  ;; adds replique-cljs, for the ClojureScript oracle cell
+  :cljs {:extra-deps {replique/replique-cljs {:local/root "../../clojure/replique-cljs"}}}}}

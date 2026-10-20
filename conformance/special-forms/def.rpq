@@ -1,0 +1,21 @@
+(ns conformance.special-forms.def)
+
+(expect nil (def x 1))
+
+^:clojure
+(scenario "a var defined in one form is visible in the next"
+  (def y 2)
+  (expect 2 y))
+
+^:clojure
+(scenario "def inside a function body defines the var when the function runs"
+  (defn setup! [] (def z 3) :done)
+  (expect :done (setup!))
+  (expect 3 z))
+
+^:clojure
+(scenario "a declared var can be defined later"
+  (declare w)
+  (defn read-w [] w)
+  (def w 4)
+  (expect 4 (read-w)))

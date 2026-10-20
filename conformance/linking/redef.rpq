@@ -1,0 +1,24 @@
+(ns conformance.linking.redef)
+
+^{:modes #{:dev} :clojure true}
+(scenario "callers see a redefinition"
+  (defn f [] 1)
+  (defn g [] (f))
+  (expect 1 (g))
+  (defn f [] 2)
+  (expect 2 (g)))
+
+^{:modes #{:advanced}}
+(scenario "redefining a static var is an error"
+  (defn f [] 1)
+  (expect-error :replique/redefine-static (defn f [] 2)))
+
+^:clojure
+(scenario "a ^:redef var can be redefined in both modes"
+  (defn ^:redef h [] 1)
+  (defn k [] (h))
+  (defn ^:redef h [] 2)
+  (expect 2 (k)))
+
+^{:modes #{:advanced}}
+(expect-error :replique/eval-in-advanced (eval '(+ 1 2)))

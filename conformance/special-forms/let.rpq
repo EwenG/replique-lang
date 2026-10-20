@@ -1,0 +1,13 @@
+(ns conformance.special-forms.let)
+
+^:clojure (expect 2 (let [a 1 b (+ a 1)] b))        ; a binding sees the ones before it
+^:clojure (expect 2 (let [a 1] (let [a 2] a)))      ; an inner binding shadows
+^:clojure (expect 1 (let [a 1] (let [a 2] a) a))
+^:clojure (expect nil (let [a 1]))                  ; an empty body is nil
+^:clojure (expect 10 (loop [i 0 acc 0] (if (< i 5) (recur (inc i) (+ acc i)) acc)))
+^:clojure (expect 3 (do 1 2 3))
+^:clojure (expect nil (do))
+
+;; a closure made in one iteration keeps that iteration's values
+^:clojure
+(expect 1 ((loop [i 0 g nil] (if (< i 3) (recur (inc i) (if (= i 1) (fn [] i) g)) g))))

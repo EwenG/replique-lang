@@ -1,0 +1,3 @@
+;; The conformance harness (doc/conformance.md).
+{:paths ["src"]
+ :deps {replique-lang/compiler {:local/root "../compiler"}}}

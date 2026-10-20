@@ -1,0 +1,35 @@
+(ns conformance.special-forms.try)
+
+^:clojure (expect-throws :ex-info (throw (ex-info "boom" nil)))
+
+(expect :caught
+  (try (throw (ex-info "boom" nil)) (catch :default _ :caught)))
+
+(scenario "finally runs after the body and does not change its value"
+  (def ran nil)
+  (expect 1 (try 1 (finally (set! ran :ran))))
+  (expect :ran ran))
+
+^:clojure
+(expect "boom"
+  (try (throw (ex-info "boom" nil))
+       (catch #?(:jvm Exception :js js/Error) e (ex-message e))))
+
+^:clojure
+(expect :second                         ; the first clause that matches
+  (try (throw (ex-info "boom" nil))
+       (catch #?(:jvm ArithmeticException :js js/TypeError) _ :first)
+       (catch #?(:jvm Exception :js js/Error) _ :second)))
+
+;; not ^:clojure: Clojure's set! of a var needs a thread binding
+(scenario "finally runs when a catch rethrows"
+  (def ran nil)
+  (expect :caught
+    (try (try (throw (ex-info "a" nil))
+              (catch #?(:jvm Exception :js js/Error) e (throw e))
+              (finally (set! ran :ran)))
+         (catch #?(:jvm Exception :js js/Error) _ :caught)))
+  (expect :ran ran))
+
+^:clojure
+(expect 3 (+ 1 (try 2 (finally 3))))  ; a try as an argument

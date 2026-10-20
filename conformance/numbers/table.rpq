@@ -1,0 +1,12 @@
+(ns conformance.numbers.table)
+
+;; doc/language.md §5.1, the rows the kernel can run before core
+
+^:clojure (expect #?(:jvm 1/2 :js 0.5) (/ 1 2))
+^:clojure (expect #?(:jvm false :js true) (= 1 1.0))
+^:clojure (expect #?(:jvm "1.0" :js "1") (str 1.0))
+^:clojure (expect 3 (+ 1 2))
+^:clojure (expect 0.5 (- 1 0.5))
+
+^{:clojure true :targets #{:jvm}}
+(expect-throws :host (+ 9223372036854775807 1))

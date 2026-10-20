@@ -1,0 +1,8 @@
+(ns conformance.special-forms.quote)
+
+^:clojure (expect x (quote x))
+^:clojure (expect a/b 'a/b)
+^:clojure (expect :k ':k)
+^:clojure (expect 1 '1)
+^:clojure (expect :a/b :a/b)          ; keywords are constants
+^:clojure (expect true (= :a :a))

@@ -1,0 +1,8 @@
+(ns conformance.special-forms.case)
+
+^:clojure (expect 2 (case :b :a 1 :b 2 3))
+^:clojure (expect :high (case 5 (1 2) :low (4 5) :high :other))
+^:clojure (expect :other (case 9 (1 2) :low :other))
+^:clojure (expect :str (case "a" "a" :str :a :kw))
+^:clojure (expect :kw (case :a "a" :str :a :kw))
+^:clojure (expect-throws :no-match (case 3 1 :a 2 :b))

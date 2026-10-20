@@ -1,0 +1,29 @@
+(ns conformance.special-forms.fn)
+
+^:clojure
+(scenario "a fn with several arities"
+  (defn f ([] 0) ([a] a) ([a b] (+ a b)))
+  (expect 0 (f))
+  (expect 1 (f 1))
+  (expect 3 (f 1 2)))
+
+(scenario "the rest parameter is nil without rest arguments, a host array with"
+  (defn r [a & more] more)
+  (expect nil (r 1))
+  (expect #array[2 3] (r 1 2 3)))
+
+^:clojure
+(expect 6 (let [a 1] (((fn [b] (fn [c] (+ a b c))) 2) 3)))   ; closures nest
+
+^:clojure
+(expect :done ((fn self [n] (if (< n 1) :done (self (dec n)))) 3))
+
+^:clojure
+(expect 15 ((fn [acc n] (if (< n 1) acc (recur (+ acc n) (dec n)))) 0 5))
+
+;; ClojureScript doesn't check arities, so these can't be ^:clojure
+(scenario "a call with the wrong number of arguments throws"
+  (defn one [a] a)
+  (expect-throws :arity (one 1 2)))
+
+(expect-throws :arity ((fn [a b] a) 1))

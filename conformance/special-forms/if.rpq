@@ -1,0 +1,7 @@
+(ns conformance.special-forms.if)
+
+^:clojure (expect 2 (if nil 1 2))
+^:clojure (expect 2 (if false 1 2))
+^:clojure (expect 1 (if 0 1 2))       ; 0 is truthy on both targets
+^:clojure (expect 1 (if "" 1 2))      ; so is the empty string
+^:clojure (expect nil (if false 1))   ; no else branch

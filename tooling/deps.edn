@@ -1,0 +1,4 @@
+;; The REPL server replique.el talks to (doc/server.md). Depends on the
+;; compiler, which knows nothing of it.
+{:paths ["src"]
+ :deps {replique-lang/compiler {:local/root "../compiler"}}}

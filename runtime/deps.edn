@@ -1,0 +1,9 @@
+;; The runtime: the host kernel and core. Depends on nothing of the compiler,
+;; and never will (doc/compilation.md §3.4).
+;;
+;; src/jvm  the JVM kernel, Java, compiled to target/classes by build.clj
+;; src/js   the JS kernel, runtime.js, served as a resource
+{:paths ["target/classes" "src/js"]
+ :deps {}
+ :deps/prep-lib {:alias :build :fn compile :ensure "target/classes"}
+ :aliases {:build {:paths ["."] :ns-default build}}}

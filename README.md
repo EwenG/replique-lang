@@ -11,8 +11,10 @@ the best of each:
   from scratch, with an analyzer that produces an AST, ESM output, injective
   naming, and var metadata kept in the compiler environment.
 
-Status: **design, the conformance harness, the reader and the analyzer.**
-Started 2026-10-10. The back ends and the runtime are not written yet.
+Status: **M1 done: the special forms in dev mode on the JVM and in JS, with a
+REPL server replique.el talks to. Code compiled to be recorded, on both
+targets, recorded on both for replique.el's `C-c C-d r`, and gone through
+with `C-c C-d v`, its views of values included.** Started 2026-10-10. Advanced mode and core are not written yet.
 
 ## What is different from Clojure
 
@@ -45,6 +47,10 @@ libraries do.
 | [`doc/reader.md`](doc/reader.md) | the reader: the lossless CST, forms with spans, what differs from Clojure's reader |
 | [`doc/analyzer.md`](doc/analyzer.md) | the analyzer: forms to IR, spans and origins, macros, types, interop |
 | [`doc/ir.md`](doc/ir.md) | the IR: what every node carries, the type lattice, the node inventory and fields |
+| [`doc/jvm.md`](doc/jvm.md) | the JVM back end: classes, hidden classes, values, linking, control |
+| [`doc/js.md`](doc/js.md) | the JS back end: a form as a function, names, statements and expressions, the Node side |
+| [`doc/server.md`](doc/server.md) | the REPL server: the part of replique's protocol it speaks, the repl, directives, recording |
+| [`doc/recording.md`](doc/recording.md) | code compiled to be recorded: the hook, which forms are sites, each back end |
 | [`doc/conformance.md`](doc/conformance.md) | the conformance harness: case files, the four cells, comparing results |
 | [`doc/runtime.md`](doc/runtime.md) | the host kernel, the protocols the compiler depends on, bootstrap order |
 | [`doc/concurrency.md`](doc/concurrency.md) | dynamic vars, structured concurrency, `async`/`await`, core.async |
@@ -55,24 +61,29 @@ libraries do.
 
 | | |
 |---|---|
-| `runtime/` | the host kernel and core; never depends on the compiler. Empty until M1 |
-| `compiler/` | the compiler, depends on the runtime. So far the reader ([`doc/reader.md`](doc/reader.md)) and the analyzer ([`doc/analyzer.md`](doc/analyzer.md)) |
+| `runtime/` | the host kernel and core; never depends on the compiler. So far the kernel's first pieces, in Java and in `runtime.js` ([`doc/runtime.md`](doc/runtime.md) §5) |
+| `compiler/` | the compiler, depends on the runtime. So far the reader ([`doc/reader.md`](doc/reader.md)), the analyzer ([`doc/analyzer.md`](doc/analyzer.md)) and the dev back ends, JVM ([`doc/jvm.md`](doc/jvm.md)) and JS ([`doc/js.md`](doc/js.md)) |
+| `tooling/` | replique's tooling: the REPL server replique.el talks to, recording, the inspector ([`doc/server.md`](doc/server.md)), depends on the compiler |
 | `harness/` | the conformance harness ([`doc/conformance.md`](doc/conformance.md)) |
 | `conformance/` | the conformance suite, `.rpq` case files |
 | `deps.edn` | the development entry point, on replique-clj |
 
-Needs the Clojure CLI, and Node for the ClojureScript oracle. replique-clj and
-replique-cljs are expected at `~/clojure/`, beside this directory's parent.
+Needs the Clojure CLI, and Node for the JS back end, the ClojureScript oracle
+and the JS kernel's tests (skipped without it). replique-clj and replique-cljs are
+expected at `~/clojure/`, beside this directory's parent.
 
 ```
-clojure -M:test                 # the compiler's and the harness's tests
-clojure -M:conformance          # the suite, on the Clojure oracle
+clojure -X:deps prep            # once: compiles the runtime's Java
+clojure -M:test                 # the runtime's, compiler's, tooling's and harness's tests
+clojure -M:server               # the REPL server, for replique.el: M-x replique-connect
+clojure -M:conformance          # the suite, on the JVM and JS dev cells and the Clojure oracle
 clojure -M:cljs:conformance     # and on the ClojureScript oracle
 clojure -M:bench                # the reader's speed against Clojure's reader
 ```
 
-The JDK 27 baseline applies to what the compiler emits; the harness runs on
-the JDK replique-clj runs on.
+The baseline is JDK 27. What is built so far runs on JDK 25, which the JVM
+back end and the harness use: dev mode runs the code it compiles in the
+compiler's own JVM.
 
 ## Names
 

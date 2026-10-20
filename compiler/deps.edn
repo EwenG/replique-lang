@@ -1,0 +1,3 @@
+;; The compiler: the reader, the analyzer and the two dev back ends so far.
+{:paths ["src"]
+ :deps {replique-lang/runtime {:local/root "../runtime"}}}
